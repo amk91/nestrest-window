@@ -1,0 +1,29 @@
+{
+  "name": "nestrest-cradle-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for NestRest Camera Monitor",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "serve": "python -m http.server 9000",
+    "serve:live": "npx live-server --port=9000 --no-browser",
+    "start": "npm run build && npm run serve"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.0",
+    "live-server": "^1.2.2",
+    "typescript": "^5.9.3"
+  },
+  "keywords": [
+    "typescript",
+    "websocket",
+    "camera",
+    "monitoring"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "watch": "^1.0.2"
+  }
+}

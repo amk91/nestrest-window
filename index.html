@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NestRest Camera Monitor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <h1>NestRest Camera Monitor</h1>
+        <div class="connection-status">
+            <div class="status-indicator" id="connectionIndicator"></div>
+            <span id="connectionStatus">Connecting...</span>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="controls-bar">
+            <div class="global-controls">
+                <button class="btn btn-primary" id="refreshAllBtn">
+                    🔄 Refresh All
+                </button>
+                <button class="btn btn-success" id="startAllRecordingBtn">
+                    ⏺️ Start All Recording
+                </button>
+                <button class="btn btn-warning" id="stopAllRecordingBtn">
+                    ⏹️ Stop All Recording
+                </button>
+                <button class="btn btn-danger" id="emergencyStopBtn">
+                    🛑 Emergency Stop
+                </button>
+            </div>
+            <div class="view-toggle">
+                <button class="btn btn-primary" id="gridViewBtn">
+                    ⊞ Grid View
+                </button>
+                <button class="btn btn-primary" id="listViewBtn">
+                    ☰ List View
+                </button>
+            </div>
+        </div>
+
+        <div id="errorContainer" class="error-message" style="display: none;">
+            <p id="errorMessage"></p>
+        </div>
+
+        <div class="cameras-grid" id="camerasGrid">
+            <!-- Camera cards will be dynamically generated here -->
+        </div>
+
+        <div id="loadingSpinner" class="loading-spinner" style="display: none;"></div>
+    </main>
+
+    <!-- Toast notification container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Camera card template -->
+    <template id="cameraCardTemplate">
+        <div class="camera-card" data-camera-id="">
+            <div class="camera-header">
+                <div class="camera-info">
+                    <h3 class="camera-name"></h3>
+                    <div class="camera-location"></div>
+                </div>
+                <div class="camera-status status-offline">
+                    <div class="status-indicator"></div>
+                    <span>Offline</span>
+                </div>
+            </div>
+            
+            <div class="video-container">
+                <video class="video-stream" style="display: none;" autoplay muted playsinline>
+                    Your browser does not support the video tag.
+                </video>
+                <div class="video-placeholder">
+                    📹 No Signal
+                </div>
+                <div class="video-overlay">
+                    <div class="recording-indicator" style="display: none;">
+                        🔴 REC
+                    </div>
+                </div>
+            </div>
+            
+            <div class="camera-controls">
+                <button class="btn btn-success toggle-power-btn" data-state="off">
+                    <span class="power-on-label">🔌 On</span>
+                    <span class="power-off-label" style="display:none;">💡 Off</span>
+                </button>
+                <button class="btn btn-primary toggle-stream-btn" data-state="off">
+                    <span class="stream-on-label">📺 Stream On</span>
+                    <span class="stream-off-label" style="display:none;">📴 Stream Off</span>
+                </button>
+            </div>
+            
+            <div class="camera-details">
+                <div class="detail-row">
+                    <span class="detail-label">Resolution:</span>
+                    <span class="detail-value resolution">N/A</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">FPS:</span>
+                    <span class="detail-value fps">N/A</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Last Update:</span>
+                    <span class="detail-value last-update">Never</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">IP Address:</span>
+                    <span class="detail-value ip-address">N/A</span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Load compiled JavaScript modules -->
+    <script type="module">
+        // Import the compiled JavaScript files in dependency order
+        try {
+            // Import in the correct order (dependencies first)
+            await import('./dist/messages.js');
+            await import('./dist/camera.js');
+            await import('./dist/ui.js');
+            await import('./dist/index.js');
+            console.log('All JavaScript modules loaded successfully');
+        } catch (error) {
+            console.error('Failed to load JavaScript modules:', error);
+        }
+    </script>
+</body>
+</html>
