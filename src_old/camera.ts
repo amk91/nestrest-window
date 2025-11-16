@@ -1,12 +1,29 @@
 // Camera management interfaces and classes
 
+import { DevicePayload } from "./messages";
+
+export enum CameraStatus {
+    Connected = 'Connected',
+    Disconnected = 'Disconnected',
+    Streaming = 'Streaming',
+    Standby = 'Standby',
+    Error = 'Error'
+}
+
 export interface CameraInfo {
     ip: string;
     lastSeen: Date;
-    status: 'Disconnected' | 'Connected' | 'Standby' | 'Error';
+    status: CameraStatus;
     element: HTMLImageElement | null;
     label: HTMLElement | null;
     frameCount: number;
+}
+
+export enum CameraCommand {
+    On = 'On',
+    Off = 'Off',
+    StreamOn = 'StreamOn',
+    StreamOff = 'StreamOff',
 }
 
 export class CameraCatalog {
@@ -24,7 +41,7 @@ export class CameraCatalog {
             camera = {
                 ip,
                 lastSeen: new Date(),
-                status: 'Connected',
+                status: CameraStatus.Connected,
                 element: null,
                 label: null,
                 frameCount: 0
@@ -35,11 +52,11 @@ export class CameraCatalog {
         } else {
             // Update existing camera
             camera.lastSeen = new Date();
-            camera.status = 'Connected';
+            camera.status = CameraStatus.Connected;
         }
-        
+
         camera.frameCount++;
-        
+
         // Trigger callbacks
         if (isNewCamera && this.onCameraAddedCallback) {
             this.onCameraAddedCallback(camera);
@@ -59,7 +76,7 @@ export class CameraCatalog {
         const camera: CameraInfo = {
             ip,
             lastSeen: new Date(),
-            status: 'Connected',
+            status: CameraStatus.Connected,
             element: null,
             label: null,
             frameCount: 0
@@ -76,6 +93,13 @@ export class CameraCatalog {
         return camera;
     }
 
+    public updateCamera(camera: DevicePayload) {
+        const cameraInfo = this.cameras.get(camera.ip);
+        if (cameraInfo !== undefined) {
+            cameraInfo.status = camera.status;
+        }
+    }
+
     public updateCameraFrame(ip: string): CameraInfo | null {
         const camera = this.cameras.get(ip);
         if (!camera) {
@@ -84,7 +108,7 @@ export class CameraCatalog {
         
         // Update camera info
     camera.lastSeen = new Date();
-    camera.status = 'Connected';
+    camera.status = CameraStatus.Connected;
     camera.frameCount++;
         
         // Trigger callback
@@ -114,7 +138,7 @@ export class CameraCatalog {
     public markInactive(ip: string): void {
         const camera = this.cameras.get(ip);
         if (camera) {
-            camera.status = 'Disconnected';
+            camera.status = CameraStatus.Disconnected;
             console.log(`Camera marked as inactive: ${ip}`);
         }
     }

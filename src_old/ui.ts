@@ -1,6 +1,7 @@
 // UI management classes for camera display
 
-import { CameraInfo } from './camera.js';
+import { CameraCommand, CameraInfo, CameraStatus } from './camera.js';
+import { WsMessageKind } from './messages.js';
 
 export class CameraGridUI {
     private gridContainer: HTMLElement;
@@ -34,6 +35,7 @@ export class CameraGridUI {
         
         // Set camera ID
         cardElement.setAttribute('data-camera-id', camera.ip);
+        cardElement.setAttribute('data-camera-state', camera.status);
         
         // Populate camera information
         const cameraName = cardElement.querySelector('.camera-name') as HTMLElement;
@@ -79,62 +81,64 @@ export class CameraGridUI {
         const powerBtn = cardElement.querySelector('.toggle-power-btn') as HTMLButtonElement;
         if (powerBtn) {
             powerBtn.addEventListener('click', () => {
-                const state = powerBtn.getAttribute('data-state');
-                if (state === 'off') {
-                    powerBtn.setAttribute('data-state', 'on');
-                    (powerBtn.querySelector('.power-on-label') as HTMLElement).style.display = 'none';
-                    (powerBtn.querySelector('.power-off-label') as HTMLElement).style.display = '';
-                    // TODO: send DeviceCommand.On
-                    console.log('Power ON for camera', camera.ip);
-                } else {
-                    powerBtn.setAttribute('data-state', 'off');
-                    (powerBtn.querySelector('.power-on-label') as HTMLElement).style.display = '';
-                    (powerBtn.querySelector('.power-off-label') as HTMLElement).style.display = 'none';
-                    // TODO: send DeviceCommand.Off
-                    console.log('Power OFF for camera', camera.ip);
+                const state = cardElement.getAttribute('data-camera-state');
+                var command = undefined;
+                if (state === CameraStatus.Connected ||
+                    state === CameraStatus.Streaming
+                ) {
+                    command = CameraCommand.Off;
+                } else if (state === CameraStatus.Disconnected) {
+                    command = CameraCommand.On;
                 }
-            });
-        }
-        const streamBtn = cardElement.querySelector('.toggle-stream-btn') as HTMLButtonElement;
-        if (streamBtn) {
-            streamBtn.addEventListener('click', () => {
-                const state = streamBtn.getAttribute('data-state');
-                if (state === 'off') {
-                    streamBtn.setAttribute('data-state', 'on');
-                    (streamBtn.querySelector('.stream-on-label') as HTMLElement).style.display = 'none';
-                    (streamBtn.querySelector('.stream-off-label') as HTMLElement).style.display = '';
-                    // Skeleton: send stream on command to backend
-                    sendStreamCommand(camera.ip, true);
-                    console.log('Stream ON for camera', camera.ip);
-                } else {
-                    streamBtn.setAttribute('data-state', 'off');
-                    (streamBtn.querySelector('.stream-on-label') as HTMLElement).style.display = '';
-                    (streamBtn.querySelector('.stream-off-label') as HTMLElement).style.display = 'none';
-                    // Skeleton: send stream off command to backend
-                    sendStreamCommand(camera.ip, false);
-                    console.log('Stream OFF for camera', camera.ip);
+
+                if (command !== undefined) {
+                    powerBtn.disabled = true;
+                    setTimeout(() => {
+                        powerBtn.disabled = false;
+                    }, 2000);
+                    sendCameraCommand(camera.ip, command);
                 }
             });
         }
 
-        function sendStreamCommand(cameraIp: string, turnOn: boolean): void {
-            // Send a message to the backend via WebSocket
-            // Assumes wsManager is available globally (set in index.ts)
+        const streamBtn = cardElement.querySelector('.toggle-stream-btn') as HTMLButtonElement;
+        if (streamBtn) {
+            streamBtn.addEventListener('click', () => {
+                const state = cardElement.getAttribute('data-camera-state');
+                var command = undefined;
+                if (state === CameraStatus.Connected ||
+                    state === CameraStatus.Streaming
+                ) {
+                    command = CameraCommand.StreamOff;
+                } else if (state === CameraStatus.Standby) {
+                    command = CameraCommand.StreamOn;
+                }
+
+                console.log("command: ", command);
+                if (command !== undefined) {
+                    streamBtn.disabled = true;
+                    setTimeout(() => {
+                        streamBtn.disabled = false;
+                    }, 2000);
+                    sendCameraCommand(camera.ip, command);
+                }
+            });
+        }
+
+        function sendCameraCommand(cameraIp: string, command: CameraCommand): void {
             const wsManager = (window as any).wsManager;
             if (!wsManager || typeof wsManager.sendMessage !== 'function') {
                 console.error('WebSocket manager not available');
                 return;
             }
 
-            // Define a custom message for stream control
-            const command = {
-                kind: 'StreamControl', // Custom kind, backend must handle this
+            const commandMessage = {
+                kind: WsMessageKind.CommandDevice,
                 payload: {
-                    ip: cameraIp,
-                    action: turnOn ? 'start' : 'stop'
+                    command: command,
                 }
             };
-            wsManager.sendMessage(command);
+            wsManager.sendMessage(commandMessage);
         }
         
         console.log(`Added camera card for ${camera.ip}`);
@@ -160,6 +164,26 @@ export class CameraGridUI {
             } else {
                 statusElement.className = 'camera-status status-offline';
                 statusSpan.textContent = 'Offline';
+            }
+        }
+
+        var powerBtn = cardElement.querySelector('.toggle-power-btn') as HTMLButtonElement;
+        if (powerBtn) {
+            if (camera.status === CameraStatus.Connected ||
+                camera.status === CameraStatus.Streaming
+            ) {
+                powerBtn.setAttribute('data-state', CameraStatus.Connected);
+            } else if (camera.status === CameraStatus.Disconnected) {
+                powerBtn.setAttribute('data-state', CameraStatus.Disconnected);
+            }
+        }
+
+        var streamBtn = cardElement.querySelector('.toggle-stream-btn') as HTMLButtonElement;
+        if (streamBtn) {
+            if (camera.status === CameraStatus.Streaming) {
+                streamBtn.setAttribute('data-state', CameraStatus.Streaming);
+            } else if (camera.status === CameraStatus.Standby) {
+                streamBtn.setAttribute('data-state', CameraStatus.Standby);
             }
         }
     }

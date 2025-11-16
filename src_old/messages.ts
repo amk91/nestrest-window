@@ -1,10 +1,13 @@
 // WebSocket message structures for communication with Rust backend
 
+import { CameraStatus } from "./camera";
+
 export enum WsMessageKind {
     Init = "Init",
     AddDevice = "AddDevice",
     UpdateDevice = "UpdateDevice",
-    RemoveDevice = "RemoveDevice"
+    RemoveDevice = "RemoveDevice",
+    CommandDevice = "CommandDevice",
 }
 
 export interface WsMessage<T = any> {
@@ -22,7 +25,7 @@ export interface InitPayload {
 export interface DevicePayload {
     kind: string
     ip: string;
-    status: string;
+    status: CameraStatus;
 }
 
 // Type-safe message interfaces for each message kind
