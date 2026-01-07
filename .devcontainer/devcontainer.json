@@ -1,0 +1,17 @@
+{
+  "name": "nestrest-winow",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20-bookworm",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "ecmel.vscode-html-css"
+      ]
+    }
+  },
+  "forwardPorts": [5173],
+  "postCreateCommand": "npm install",
+  "remoteUser": "node"
+}

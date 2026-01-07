@@ -17,9 +17,12 @@ export enum DeviceCommand {
     StopStream = "StopStream",
     StartStream = "StartStream",
     StreamOnMotionDetected = "StreamOnMotionDetected",
+    TurnLedOn = "TurnLedOn",
+    TurnLedOff = "TurnLedOff",
 }
 
 export const DeviceInfoSchema = z.object({
+    name: z.string(),
     kind: z.enum(DeviceType),
     ip: z.ipv4(),
     status: z.string(),
@@ -28,12 +31,14 @@ export const DeviceInfoSchema = z.object({
 export type DeviceInfo = z.infer<typeof DeviceInfoSchema>;
 
 export class Device {
+    name: string;
     kind: DeviceType;
     ip: string;
     status: DeviceStatus[];
     fps: number;
 
-    constructor(kind: DeviceType, ip: string, status: string, fps: number = 0) {
+    constructor(name: string, kind: DeviceType, ip: string, status: string, fps: number = 0) {
+        this.name = name;
         this.kind = kind;
         this.ip = ip;
         this.status = Device.statusFromString(status)
@@ -48,7 +53,7 @@ export class Device {
     }
 
     public static fromDeviceInfo(deviceInfo: DeviceInfo): Device {
-        return new Device(deviceInfo.kind, deviceInfo.ip, deviceInfo.status, deviceInfo.fps);
+        return new Device(deviceInfo.name, deviceInfo.kind, deviceInfo.ip, deviceInfo.status, deviceInfo.fps);
     }
 
     public updateFromDeviceInfo(deviceInfo: DeviceInfo) {
@@ -58,6 +63,7 @@ export class Device {
 
     public toDeviceInfo(): DeviceInfo {
         return {
+            name: this.name,
             kind: this.kind,
             ip: this.ip,
             status: this.status.join(' | '),

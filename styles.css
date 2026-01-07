@@ -1,3 +1,5 @@
+@import "https://www.nerdfonts.com/assets/css/webfont.css";
+
 /* Custom Tooltip Styles */
 .tooltip-wrapper {
     position: relative;
@@ -71,8 +73,17 @@ body {
     margin-bottom: 1rem;
 }
 .device-name {
-    font-weight: 500;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #90caf9;
+    background: #23272f;
+    padding: 6px 14px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(33,150,243,0.10);
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+    display: inline-block;
+    border: 1px solid #2196f3;
 }
 .device-status {
     font-size: 0.95rem;
@@ -208,6 +219,14 @@ body {
 }
 .btn-motion-stream::before {
     content: '\1F50D'; /* magnifying glass (motion) */
+    font-size: 1.3rem;
+}
+.btn-turn-led-on::before {
+    content: '\1F506'; /* magnifying glass (motion) */
+    font-size: 1.3rem;
+}
+.btn-turn-led-off::before {
+    content: '\1F505'; /* magnifying glass (motion) */
     font-size: 1.3rem;
 }
 

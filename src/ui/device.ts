@@ -10,6 +10,8 @@ export class UiDevice {
     startStreamButton: HTMLButtonElement | null = null;
     stopStreamButton: HTMLButtonElement | null = null;
     streamOnMotionDetectedButton: HTMLButtonElement | null = null;
+    turnLedOnButton: HTMLButtonElement | null = null;
+    turnLedOffButton: HTMLButtonElement | null = null;
 
     onGrid: boolean = false;
     onScreen: boolean = false;
@@ -31,11 +33,10 @@ export class UiDevice {
     }
 
     private setupHeader() {
-        //TODO: add this in the future
-        // const nameSpan = this.card?.querySelector('#device-name') as HTMLSpanElement;
-        // if (nameSpan) {
-        //     nameSpan.textContent = this.device.name;
-        // }
+        const nameSpan = this.card?.querySelector('.device-name') as HTMLSpanElement;
+        if (nameSpan) {
+            nameSpan.textContent = this.device.name;
+        }
 
         const statusSpan = this.card?.querySelector('.device-status') as HTMLSpanElement;
         if (statusSpan && this.device.status.length > 0) {
@@ -83,6 +84,16 @@ export class UiDevice {
         this.streamOnMotionDetectedButton = this.card?.querySelector('.btn-motion-stream') as HTMLButtonElement;
         this.streamOnMotionDetectedButton.onclick = (_) => {
             (window as any).app.sendCommandToDevice(this.device, DeviceCommand.StreamOnMotionDetected);
+        };
+
+        this.turnLedOnButton = this.card?.querySelector('.btn-turn-led-on') as HTMLButtonElement;
+        this.turnLedOnButton.onclick = (_) => {
+            (window as any).app.sendCommandToDevice(this.device, DeviceCommand.TurnLedOn);
+        };
+
+        this.turnLedOffButton = this.card?.querySelector('.btn-turn-led-off') as HTMLButtonElement;
+        this.turnLedOffButton.onclick = (_) => {
+            (window as any).app.sendCommandToDevice(this.device, DeviceCommand.TurnLedOff);
         };
 
         this.updateStatus();
