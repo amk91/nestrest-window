@@ -7,6 +7,7 @@ export class UiDevice {
     image: HTMLImageElement | null = null;
     fpsSpan: HTMLSpanElement | null = null;
     restartDeviceButton: HTMLButtonElement | null = null;
+    resetDeviceButton: HTMLButtonElement | null = null;
     startStreamButton: HTMLButtonElement | null = null;
     stopStreamButton: HTMLButtonElement | null = null;
     streamOnMotionDetectedButton: HTMLButtonElement | null = null;
@@ -69,6 +70,14 @@ export class UiDevice {
         this.restartDeviceButton = this.card?.querySelector('.btn-restart') as HTMLButtonElement;
         this.restartDeviceButton.onclick = (_) => {
             (window as any).app.sendCommandToDevice(this.device, DeviceCommand.RestartDevice);
+        };
+
+        this.resetDeviceButton = this.card?.querySelector('.btn-reset') as HTMLButtonElement;
+        this.resetDeviceButton.onclick = (_) => {
+            const isConfirmed: boolean = window.confirm("Are you sure you want to reset the device?");
+            if (isConfirmed) {
+                (window as any).app.sendCommandToDevice(this.device, DeviceCommand.ResetDevice);
+            }
         };
 
         this.stopStreamButton = this.card?.querySelector('.btn-stop-stream') as HTMLButtonElement;

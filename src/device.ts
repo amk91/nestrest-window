@@ -14,6 +14,7 @@ export enum DeviceStatus {
 
 export enum DeviceCommand {
     RestartDevice = "RestartDevice",
+    ResetDevice = "ResetDevice",
     StopStream = "StopStream",
     StartStream = "StartStream",
     StreamOnMotionDetected = "StreamOnMotionDetected",
